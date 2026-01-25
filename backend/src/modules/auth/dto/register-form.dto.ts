@@ -1,11 +1,19 @@
-import { IsString, IsEnum, IsEmail } from 'class-validator';
+import {
+  IsString,
+  IsEnum,
+  IsEmail,
+  IsNotEmpty,
+  IsDateString,
+  MinLength,
+} from 'class-validator';
 import { RegisterForm } from '../domain/register-form';
 import { Gender } from '../../user/domain/gender';
-import _ from 'lodash';
+import { toLower } from 'lodash';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterFormDto {
   @IsString()
+  @IsNotEmpty()
   @ApiProperty({
     example: 'John',
     description: 'First name of the user',
@@ -13,6 +21,7 @@ export class RegisterFormDto {
   firstName: string;
 
   @IsString()
+  @IsNotEmpty()
   @ApiProperty({
     example: 'Doe',
     description: 'Last name of the user',
@@ -29,12 +38,13 @@ export class RegisterFormDto {
 
   @IsEnum(Gender)
   @ApiProperty({
-    example: 'male',
+    example: 'MALE',
     description: 'Gender of the user',
   })
   gender: Gender;
 
   @IsString()
+  @IsDateString()
   @ApiProperty({
     example: '1990-01-01',
     description: 'Birthday of the user',
@@ -49,6 +59,7 @@ export class RegisterFormDto {
   phoneNumber: string;
 
   @IsString()
+  @MinLength(6)
   @ApiProperty({
     example: 'password123',
     description: 'Password for the user',
@@ -58,7 +69,7 @@ export class RegisterFormDto {
   public static toRegisterForm(_this: RegisterFormDto): RegisterForm {
     return {
       ..._this,
-      email: _.toLower(_this.email),
+      email: toLower(_this.email),
     };
   }
 }

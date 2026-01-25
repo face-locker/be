@@ -1,7 +1,7 @@
 import { IsEmail } from 'class-validator';
 import { IsString } from 'class-validator';
 import { LoginForm } from '../domain/login-form';
-import _ from 'lodash';
+import { toLower } from 'lodash';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginFormDto {
@@ -23,7 +23,7 @@ export class LoginFormDto {
   public static toLoginForm(dto: LoginFormDto): LoginForm {
     return {
       ...dto,
-      email: _.toLower(dto.email),
+      email: toLower(dto.email),
     };
   }
 }

@@ -25,10 +25,7 @@ export class LoggingExceptionFilter implements ExceptionFilter {
 
       if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
         const responseObj = exceptionResponse as Record<string, unknown>;
-        message =
-          (typeof responseObj.message === 'string'
-            ? responseObj.message
-            : undefined) || exception.message;
+        message = (responseObj.message as string) || exception.message;
         details =
           (typeof responseObj.error === 'string'
             ? responseObj.error
