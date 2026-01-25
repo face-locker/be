@@ -5,16 +5,11 @@ import { UserEntity } from './entities/user.entity';
 import { UserController } from './user.controller';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UpdateUserCommandHandler } from './cqrs/commands/handlers/update-user.command.handler';
-import { MediaServiceModule } from '../media-service/media-service.module';
 
 const commandHandlers = [UpdateUserCommandHandler];
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([UserEntity]),
-    CqrsModule,
-    MediaServiceModule,
-  ],
+  imports: [TypeOrmModule.forFeature([UserEntity]), CqrsModule],
   controllers: [UserController],
   providers: [UserRepository, ...commandHandlers],
   exports: [UserRepository],

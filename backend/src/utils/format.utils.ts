@@ -18,6 +18,3 @@ export const formatDateTime = (d?: Date | string, locale = 'vi-VN') => {
     return String(d);
   }
 };
-
-export const sum = (arr: any[], selector: (x: any) => number) =>
-  arr.reduce((s, i) => s + (selector(i) || 0), 0);

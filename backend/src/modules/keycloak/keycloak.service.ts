@@ -64,7 +64,7 @@ export class KeycloakService implements OnModuleInit {
     });
   }
 
-  async googleLogin(token: String): Promise<Token> {
+  async googleLogin(token: string): Promise<Token> {
     return await this.requestToken({
       grant_type: 'urn:ietf:params:oauth:grant-type:token-exchange',
       subject_token: token,
@@ -72,7 +72,7 @@ export class KeycloakService implements OnModuleInit {
     });
   }
 
-  async impersonate(userId: String): Promise<Token> {
+  async impersonate(userId: string): Promise<Token> {
     return await this.requestToken({
       grant_type: 'urn:ietf:params:oauth:grant-type:token-exchange',
       requested_subject: userId,
@@ -86,21 +86,30 @@ export class KeycloakService implements OnModuleInit {
     });
   }
 
-  private async requestToken(body: any): Promise<Token> {
+  private async requestToken(body: Record<string, string>): Promise<Token> {
     const response = await this.performTokenRequest(body);
+    const data = response.data as {
+      access_token: string;
+      refresh_token: string;
+      expires_in: number;
+      token_type: string;
+      refresh_expires_in: number;
+      scope: string;
+      session_state: string;
+    };
 
     return {
-      accessToken: response.data.access_token,
-      refreshToken: response.data.refresh_token,
-      expiresIn: response.data.expires_in,
-      tokenType: response.data.token_type,
-      refreshExpiresIn: response.data.refresh_expires_in,
-      scope: response.data.scope,
-      sessionState: response.data.session_state,
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token,
+      expiresIn: data.expires_in,
+      tokenType: data.token_type,
+      refreshExpiresIn: data.refresh_expires_in,
+      scope: data.scope,
+      sessionState: data.session_state,
     };
   }
 
-  private async performTokenRequest(body: any) {
+  private async performTokenRequest(body: Record<string, string>) {
     const tokenUri = this.configService.keycloakJwtConfig.tokenUri;
     try {
       return await axios.post(
@@ -119,7 +128,8 @@ export class KeycloakService implements OnModuleInit {
     } catch (e) {
       if (e instanceof AxiosError) {
         if (e.status == 400 || e.status == 401) {
-          throw new BadRequestException(e.response?.data.error_description);
+          const errorData = e.response?.data as { error_description?: string };
+          throw new BadRequestException(errorData.error_description);
         }
       }
       throw e;

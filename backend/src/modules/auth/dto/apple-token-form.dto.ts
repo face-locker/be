@@ -1,12 +1,12 @@
-import { StringField } from '../../../decorator/field.decorators';
+import { IsString } from 'class-validator';
 import { AppleTokenForm } from '../domain/apple-token-form';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AppleTokenFormDto {
-  @StringField()
+  @IsString()
   token: string;
 
-  @StringField()
+  @IsString()
   userIdentifier: string;
 
   @ApiProperty({ required: false })

@@ -17,16 +17,25 @@ export class LoggingExceptionFilter implements ExceptionFilter {
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Internal server error';
-    let details: any = undefined;
+    let details: string | undefined = undefined;
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
 
       if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
-        const responseObj = exceptionResponse as any;
-        message = responseObj.message || exception.message;
-        details = responseObj.error || responseObj.message;
+        const responseObj = exceptionResponse as Record<string, unknown>;
+        message =
+          (typeof responseObj.message === 'string'
+            ? responseObj.message
+            : undefined) || exception.message;
+        details =
+          (typeof responseObj.error === 'string'
+            ? responseObj.error
+            : undefined) ||
+          (typeof responseObj.message === 'string'
+            ? responseObj.message
+            : undefined);
       } else {
         message = exception.message;
       }
@@ -35,7 +44,13 @@ export class LoggingExceptionFilter implements ExceptionFilter {
       Logger.error(message, exception);
     }
 
-    const errorResponse: any = {
+    const errorResponse: {
+      statusCode: number;
+      timestamp: string;
+      path: string;
+      message: string;
+      details?: string;
+    } = {
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,

@@ -1,25 +1,20 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { UpdateUserCommand } from '../implements/update-user.command';
 import { UserRepository } from 'src/modules/user/repository/user.repository';
-import { Inject } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
-import { MediaDto } from 'src/modules/media-service/dto/media.dto';
-import { MediaService } from 'src/modules/media-service/media-service.token';
+import { GetMediaByIdsQuery } from 'src/modules/media/cqrs/queries/implements/get-media-by-ids.query';
+import { Uuid } from 'src/shared/domain/value-objects/uuid.vo';
+import { Media } from 'src/modules/media/domain/media';
 
 @CommandHandler(UpdateUserCommand)
 export class UpdateUserCommandHandler implements ICommandHandler<UpdateUserCommand> {
   constructor(
     private readonly userRepository: UserRepository,
-    @Inject(MediaService.name)
-    private readonly client: ClientProxy,
+    private readonly queryBus: QueryBus,
   ) {}
 
   async execute(updateUserCommand: UpdateUserCommand): Promise<void> {
-    const media = await firstValueFrom(
-      this.client.send<MediaDto[]>(MediaService.getByIds, [
-        updateUserCommand.avatarId,
-      ]),
+    const media: Media[] = await this.queryBus.execute(
+      new GetMediaByIdsQuery([updateUserCommand.avatarId] as Uuid[]),
     );
 
     await this.userRepository.update({

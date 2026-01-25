@@ -1,19 +1,19 @@
 import { IsEmail } from 'class-validator';
-import { StringField } from '../../../decorator/field.decorators';
+import { IsString } from 'class-validator';
 import { LoginForm } from '../domain/login-form';
 import _ from 'lodash';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginFormDto {
   @IsEmail()
-  @StringField()
+  @IsString()
   @ApiProperty({
     example: 'john.doe@example.com',
     description: 'Email address of the user',
   })
   email: string;
 
-  @StringField({ minLength: 6 })
+  @IsString()
   @ApiProperty({
     example: 'password123',
     description: 'Password for the user',

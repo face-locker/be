@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 import { Uuid } from 'src/shared/domain/value-objects/uuid.vo';
 import { Gender } from '../domain/gender';
 import { AbstractEntity } from 'src/shared/infra/typeorm/persistence/type-orm.abstract.entity';

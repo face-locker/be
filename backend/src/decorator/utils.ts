@@ -11,7 +11,7 @@ export function getVariableName<TResult>(getVar: () => TResult): string {
 
   const fullMemberName = m[1];
 
-  const memberParts = fullMemberName!.split('.');
+  const memberParts = fullMemberName.split('.');
 
   return memberParts.at(-1)!;
 }

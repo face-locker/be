@@ -39,6 +39,13 @@ export class ApiConfigService {
     };
   }
 
+  get s3Config() {
+    return {
+      supabaseUrl: this.getString('SUPABASE_URL'),
+      supabaseServiceRoleKey: this.getString('SUPABASE_SERVICE_ROLE_KEY'),
+    };
+  }
+
   get dbConfig() {
     const prod = this.isProduction;
 
