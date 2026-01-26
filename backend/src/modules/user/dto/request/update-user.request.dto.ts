@@ -9,8 +9,8 @@ import {
   MinLength,
 } from 'class-validator';
 import { Uuid } from 'src/shared/domain/value-objects/uuid.vo';
-import { IsNullable } from 'src/decorator/validator.decorators';
 import { Gender } from '../../domain/gender';
+import { IsNullable } from 'src/decorator/validator.decorators';
 
 export class UpdateUserRequestDto {
   @ApiProperty({

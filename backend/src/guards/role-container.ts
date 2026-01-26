@@ -6,10 +6,10 @@ function requireRole(roles: RoleType[]): MethodDecorator {
   return applyDecorators(SetMetadata('roles', roles));
 }
 
-export function RequireAdmin(): MethodDecorator {
-  return requireRole([RoleType.ADMIN]);
-}
-
 export function RequireLoggedIn(): MethodDecorator {
   return requireRole([RoleType.USER, RoleType.ADMIN]);
+}
+
+export function RequiredRoles(roles: RoleType[]): MethodDecorator {
+  return requireRole(roles);
 }

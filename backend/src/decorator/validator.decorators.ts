@@ -4,7 +4,6 @@ import {
   registerDecorator,
   ValidateIf,
 } from 'class-validator';
-import dayjs from 'dayjs';
 import { isString } from 'lodash';
 
 export function IsPassword(
@@ -64,57 +63,4 @@ export function IsUndefinable(options?: ValidationOptions): PropertyDecorator {
 
 export function IsNullable(options?: ValidationOptions): PropertyDecorator {
   return ValidateIf((_, value) => value !== null, options);
-}
-
-export function IsFutureTime(
-  validationOptions?: ValidationOptions,
-): PropertyDecorator {
-  return (object, propertyName: string) => {
-    registerDecorator({
-      propertyName,
-      name: 'isFeatureTime',
-      target: object.constructor,
-      constraints: [],
-      options: validationOptions,
-      validator: {
-        validate(value: Date) {
-          return value >= new Date();
-        },
-        defaultMessage(): string {
-          return `${propertyName} must be future time`;
-        },
-      },
-    });
-  };
-}
-
-export function IsFutureDate(
-  validationOptions?: ValidationOptions,
-): PropertyDecorator {
-  return (object, propertyName: string) => {
-    registerDecorator({
-      propertyName,
-      name: 'isFeatureDate',
-      target: object.constructor,
-      constraints: [],
-      options: validationOptions,
-      validator: {
-        validate(value: Date) {
-          return (
-            value >=
-            new Date(
-              dayjs()
-                .set('hour', 0)
-                .set('minute', 0)
-                .set('second', 0)
-                .toString(),
-            )
-          );
-        },
-        defaultMessage(): string {
-          return `${propertyName} must be future date`;
-        },
-      },
-    });
-  };
 }

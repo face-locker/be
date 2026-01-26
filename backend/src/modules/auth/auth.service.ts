@@ -1,5 +1,5 @@
 import { RegisterForm } from './domain/register-form';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
 import { KeycloakService } from '../keycloak/keycloak.service';
 import { UserEntity } from '../user/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,15 +15,48 @@ import { Uuid } from 'src/shared/domain/value-objects/uuid.vo';
 import { jwtDecode } from 'jwt-decode';
 import { TokenPayload } from './domain/token-payload';
 import { UserChangePasswordFormDto } from './dto/user-change-password-form.dto';
+import { User } from '../user/domain/user';
+import { RoleType } from 'src/guards/role-type';
 
 @Injectable()
-export class AuthService {
+export class AuthService implements OnModuleInit {
   constructor(
     private readonly keycloakService: KeycloakService,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     private apiConfigService: ApiConfigService,
   ) {}
+
+  async onModuleInit() {
+    const userEntity = await this.userRepository.findOneBy({
+      id: '00000000-0000-0000-0000-000000000001' as Uuid,
+    });
+
+    if (userEntity) {
+      return;
+    }
+
+    const adminUser = User.create({
+      id: '00000000-0000-0000-0000-000000000001' as Uuid,
+      firstName: 'Admin',
+      lastName: 'Admin',
+      role: RoleType.ADMIN,
+      email: 'admin@gmail.com',
+      phoneNumber: '0123456789',
+    });
+
+    const { id } = await this.keycloakService.createUser({
+      email: adminUser.email,
+      firstName: adminUser.firstName,
+      lastName: adminUser.lastName,
+      password: '123123123',
+    });
+
+    await this.userRepository.save({
+      ...adminUser,
+      keyCloakId: id,
+    } as UserEntity);
+  }
 
   async register(registerForm: RegisterForm): Promise<AuthResult> {
     if (await this.userRepository.findOneBy({ email: registerForm.email })) {

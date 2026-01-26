@@ -10,6 +10,7 @@ import { LoggingExceptionFilter } from './filter/error-handling-exception-filter
 import { SharedModule } from './shared/shared.module';
 import { MediaModule } from './modules/media/media.module';
 import { S3Module } from './modules/s3/s3.module';
+import { LockersModule } from './modules/lockers/lockers.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { S3Module } from './modules/s3/s3.module';
     SharedModule,
     MediaModule,
     S3Module,
+    LockersModule,
   ],
   providers: [
     {

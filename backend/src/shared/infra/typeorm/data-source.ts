@@ -17,7 +17,7 @@ export const AppDataSource = new DataSource({
   logging: process.env.NODE_ENV !== 'production',
   entities: [__dirname + '/../../../modules/**/entities/*.entity{.ts,.js}'],
   migrations: [__dirname + '/migrations/*{.ts,.js}'],
-  seeds: [__dirname + '/../../../modules/**/seeds/*{.ts,.js}'],
+  seeds: [__dirname + '/../../../modules/**/entities/seeds/*{.ts,.js}'],
   cli: {
     entitiesDir: 'src',
     subscribersDir: 'subscriber',

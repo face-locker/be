@@ -2,6 +2,7 @@ import { Uuid } from 'src/shared/domain/value-objects/uuid.vo';
 import { Gender } from './gender';
 import { RoleType } from '../../../guards/role-type';
 import { UserEntity } from '../entities/user.entity';
+import { generateUuid } from 'src/utils/uuid.utils';
 
 export class User {
   id: Uuid;
@@ -38,6 +39,17 @@ export class User {
       gender: userEntity.gender,
       birthday: userEntity.birthday,
       phoneNumber: userEntity.phoneNumber,
+    };
+  }
+
+  public static create(
+    props: Omit<User, 'id'> & {
+      id?: Uuid;
+    },
+  ): User {
+    return {
+      id: props.id ?? generateUuid(),
+      ...props,
     };
   }
 }
