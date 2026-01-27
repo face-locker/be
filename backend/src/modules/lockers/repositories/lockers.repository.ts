@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Locker } from '../domain/lockers';
 import { LockersMapper } from '../mappers/lockers.mapper';
 import { Uuid } from 'src/shared/domain/value-objects/uuid.vo';
+import { PagedResponse } from 'src/shared/configuration/paged.response';
 
 @Injectable()
 export class LockersRepository {
@@ -33,5 +34,74 @@ export class LockersRepository {
     return LockersMapper.toDomainOrNull(
       await this.repository.findOneBy({ esp32Id }),
     );
+  }
+
+  async findAll(
+    pageNumber: number,
+    pageSize: number,
+    filters?: {
+      status?: string;
+      size?: string;
+      doorState?: string;
+      location?: string;
+      code?: string;
+      esp32Id?: string;
+    },
+  ): Promise<PagedResponse<Locker>> {
+    const queryBuilder = this.repository.createQueryBuilder('locker');
+
+    if (filters?.status) {
+      queryBuilder.andWhere('locker.status = :status', {
+        status: filters.status,
+      });
+    }
+    if (filters?.size) {
+      queryBuilder.andWhere('locker.size = :size', { size: filters.size });
+    }
+    if (filters?.doorState) {
+      queryBuilder.andWhere('locker.doorState = :doorState', {
+        doorState: filters.doorState,
+      });
+    }
+    if (filters?.location) {
+      queryBuilder.andWhere('locker.location ILIKE :location', {
+        location: `%${filters.location}%`,
+      });
+    }
+    if (filters?.code) {
+      queryBuilder.andWhere('locker.code ILIKE :code', {
+        code: `%${filters.code}%`,
+      });
+    }
+    if (filters?.esp32Id) {
+      queryBuilder.andWhere('locker.esp32Id ILIKE :esp32Id', {
+        esp32Id: `%${filters.esp32Id}%`,
+      });
+    }
+
+    const [entities, totalRecords] = await queryBuilder
+      .skip((pageNumber - 1) * pageSize)
+      .take(pageSize)
+      .orderBy('locker.createdAt', 'DESC')
+      .getManyAndCount();
+
+    return {
+      data: LockersMapper.toDomains(entities),
+      pageNumber,
+      pageSize,
+      totalRecords,
+      totalPages: Math.ceil(totalRecords / pageSize),
+    };
+  }
+
+  async update(locker: Locker): Promise<void> {
+    await this.repository.update(
+      { id: locker.id },
+      LockersMapper.toEntity(locker),
+    );
+  }
+
+  async delete(id: Uuid): Promise<void> {
+    await this.repository.delete({ id });
   }
 }
