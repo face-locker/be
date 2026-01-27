@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
 } from '@nestjs/common';
@@ -25,6 +26,8 @@ import { PagedResponseDto } from 'src/shared/configuration/paged.response.dto';
 import { LockerResponseDto } from './dtos/responses/locker.response.dto';
 import { LockerUpdateRequestDto } from './dtos/requests/locker-update.request.dto';
 import { LockerUpdateCommand } from './cqrs/commands/implements/locker-update.command';
+import { LockerUpdateStateRequestDto } from './dtos/requests/locker-update-state.request.dto';
+import { LockerUpdateStateCommand } from './cqrs/commands/implements/locker-update-state.command';
 import { LockerDeleteCommand } from './cqrs/commands/implements/locker-delete.command';
 import { Uuid } from 'src/shared/domain/value-objects/uuid.vo';
 import { Locker } from './domain/lockers';
@@ -98,6 +101,27 @@ export class LockersController {
     await this.commandBus.execute(
       new LockerUpdateCommand(
         LockerUpdateRequestDto.toDomain(id, lockerUpdateRequestDto),
+      ),
+    );
+  }
+
+  @Patch('/:id/state')
+  @ApiOperation({ summary: 'Update locker status and door state' })
+  @ApiResponse({
+    status: 200,
+    description: 'Locker state updated successfully.',
+  })
+  @ApiResponse({ status: 404, description: 'Locker not found.' })
+  @RequiredRoles([RoleType.ADMIN, RoleType.USER])
+  async updateLockerState(
+    @Param('id') id: Uuid,
+    @Body() lockerUpdateStateRequestDto: LockerUpdateStateRequestDto,
+  ) {
+    await this.commandBus.execute(
+      new LockerUpdateStateCommand(
+        id,
+        lockerUpdateStateRequestDto.status,
+        lockerUpdateStateRequestDto.doorState,
       ),
     );
   }

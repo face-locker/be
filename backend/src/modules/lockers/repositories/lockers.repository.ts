@@ -94,13 +94,6 @@ export class LockersRepository {
     };
   }
 
-  async update(locker: Locker): Promise<void> {
-    await this.repository.update(
-      { id: locker.id },
-      LockersMapper.toEntity(locker),
-    );
-  }
-
   async delete(id: Uuid): Promise<void> {
     await this.repository.delete({ id });
   }
